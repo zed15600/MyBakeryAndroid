@@ -1,6 +1,7 @@
 package com.lezh.mybakery
 
 import android.content.Context
+import android.net.nsd.NsdManager
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
@@ -28,6 +29,22 @@ class RequestManager {
             Response.ErrorListener { error ->
                 errorCompletion(error)
             }
+        )
+        queue.add(stringRequest)
+    }
+
+    fun requestVendors(completion: (Array<Vendor>) -> Unit, errorCompletion: (VolleyError) -> Unit, context: Context) {
+        val queue = Volley.newRequestQueue(context)
+        val url = baseUrl.format("vendors")
+
+        val stringRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            Response.Listener { response ->
+                var resp = ResponseVendors().toObject(response)
+                completion(resp.vendors)
+            },
+            Response.ErrorListener(errorCompletion)
         )
         queue.add(stringRequest)
     }

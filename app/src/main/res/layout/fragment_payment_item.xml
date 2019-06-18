@@ -9,17 +9,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceListItem" android:layout_weight="1" android:gravity="center"
-            android:background="#C58787"/>
+            android:background="#C58787" android:paddingTop="8dp" android:paddingBottom="8dp"/>
 
     <TextView
             android:id="@+id/date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceListItem" android:layout_weight="1" android:gravity="center"
-            android:background="#61ACD3"/>
+            android:background="#61ACD3" android:paddingTop="8dp" android:paddingBottom="8dp"/>
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/value" android:layout_weight="1"
             android:textAppearance="?attr/textAppearanceListItem" android:gravity="center"
-            android:background="#F1EE82"/>
+            android:background="#F1EE82" android:paddingTop="8dp" android:paddingBottom="8dp"/>
 </LinearLayout>

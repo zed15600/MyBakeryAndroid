@@ -8,15 +8,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <fragment
-            android:layout_width="0dp"
-            android:layout_height="0dp" android:name="com.lezh.mybakery.payments.PaymentsFragment"
-            android:id="@+id/fragment" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/nav_view" android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp" android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
-            tools:layout="@layout/fragment_payments_list"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:layout_editor_absoluteX="-28dp" app:layout_constraintBottom_toTopOf="@+id/nav_view"
+            app:layout_constraintTop_toTopOf="parent" android:id="@+id/fragments_container">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true" app:srcCompat="@android:drawable/ic_menu_add"
+                android:id="@+id/floatingActionButton"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="8dp" android:layout_marginEnd="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
         android:layout_width="0dp"

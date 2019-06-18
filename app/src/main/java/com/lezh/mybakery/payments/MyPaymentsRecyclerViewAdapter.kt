@@ -16,7 +16,7 @@ import com.lezh.mybakery.payments.PaymentsFragment.OnListFragmentInteractionList
 import kotlinx.android.synthetic.main.fragment_payment_item.view.*
 
 /**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
+ * [RecyclerView.Adapter] that can display a [Payment] and makes a call to the
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
@@ -52,7 +52,7 @@ class MyPaymentsRecyclerViewAdapter(
                 notifyDataSetChanged()
             },
             { error ->
-                Log.d("request", error.message)
+                Log.d("request", error.toString())
             },
             context
         )

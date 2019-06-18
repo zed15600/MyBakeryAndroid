@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.lezh.mybakery.Payment
 import com.lezh.mybakery.R
-import com.lezh.mybakery.RequestManager
 
 /**
  * A fragment representing a list of Items.
@@ -43,7 +42,7 @@ class PaymentsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_payments_list, container, false)
+        val view = inflater.inflate(R.layout.payments_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
