@@ -15,14 +15,15 @@ class RequestManager constructor(context: Context) {
     internal class StringRequest(
         method: Int,
         url: String,
-        private val heads: MutableMap<String, String>,
         private val pars: String,
         completion: (String) -> Unit,
         errorCompletion: (VolleyError) -> Unit
     ): com.android.volley.toolbox.StringRequest(method, url, completion, errorCompletion) {
 
         override fun getHeaders(): MutableMap<String, String> {
-            return heads
+            return HashMap<String, String>().apply {
+                put("Content-Type", "application/json")
+            }
         }
         override fun getBody(): ByteArray {
             return pars.toUtf8Bytes()
@@ -42,7 +43,7 @@ class RequestManager constructor(context: Context) {
     }
     private val baseUrl = "http://54.233.228.170:3000/%s.json"
 
-    fun request(target: String, completion: (Array<Payment>)->Unit, errorCompletion: (VolleyError)->Unit) {
+    fun requestPayments(target: String, completion: (Array<Payment>)->Unit, errorCompletion: (VolleyError)->Unit) {
         val url = baseUrl.format(target)
 
         val stringRequest = StringRequest(
@@ -75,14 +76,22 @@ class RequestManager constructor(context: Context) {
     }
 
     fun createNewPayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
-        val url = baseUrl.format("payments")
+        request(payment, "payments", Request.Method.POST, completion, errorCompletion)
+    }
 
-        val headers = HashMap<String, String>().apply {
-            put("Content-Type", "application/json")
-        }
+    fun updatePayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request(payment, "payments/${payment.id}", Request.Method.PATCH, completion, errorCompletion)
+    }
+
+    private fun request(payment: Payment,
+                    target: String,
+                    method: Int,
+                    completion: (String) -> Unit,
+                    errorCompletion: (VolleyError) -> Unit) {
+        val url = baseUrl.format(target)
         val params = "{\"payment\":$payment}"
 
-        val request = StringRequest(Request.Method.POST, url, headers, params, completion, errorCompletion)
+        val request = StringRequest(method, url, params, completion, errorCompletion)
         requestQueue.add(request)
     }
 }

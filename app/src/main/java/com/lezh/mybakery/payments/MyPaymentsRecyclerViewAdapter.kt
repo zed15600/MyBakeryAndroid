@@ -47,14 +47,14 @@ class MyPaymentsRecyclerViewAdapter(
             // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
         }
-        RequestManager.getInstance(context).request(
+        RequestManager.getInstance(context).requestPayments(
             "payments",
             { payments ->
                 mValues += payments
                 notifyDataSetChanged()
             },
             { error ->
-                Log.d("request", error.message)
+                Log.d("requestPayments", String(error.networkResponse.data))
             }
         )
         //TODO optimize this

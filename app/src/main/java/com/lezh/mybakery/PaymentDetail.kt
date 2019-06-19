@@ -25,8 +25,11 @@ class PaymentDetail : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment_detail)
 
+        payment = intent.getSerializableExtra("payment") as Payment
+
         vendorsPicker = findViewById(R.id.vendorsPicker)
         vendorsPicker.onItemSelectedListener = this
+
         dateInput = findViewById(R.id.paymentDetailDateInput)
         dateInput.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -35,6 +38,7 @@ class PaymentDetail : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 payment.date = editable.toString()
             }
         })
+
         valueInput = findViewById(R.id.paymentDetailValueInput)
         valueInput.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -45,33 +49,69 @@ class PaymentDetail : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 } catch (e: Exception) {}
             }
         })
+
         findViewById<View>(R.id.payment_commit).apply {
             setOnClickListener {
-                RequestManager.getInstance(context).createNewPayment(
-                    payment,
-                    { response ->
-                        payment.id = Payment().toObject(response).id
-                        showAlert(
-                            "Request Successful",
-                            "",
-                            arrayOf(
-                                AlertAction("Ok", AlertActionType.neutral, null)
+                if (payment.id == 0) {
+                    RequestManager.getInstance(context).createNewPayment(
+                        payment,
+                        { response ->
+                            payment.id = Payment().toObject(response).id
+                            showAlert(
+                                "Request Successful",
+                                null,
+                                arrayOf(
+                                    AlertAction("Ok", AlertActionType.neutral)
+                                )
                             )
-                        )
-                    },
-                    { error ->
-                        showAlert(
-                            "Request Failed",
-                            String(error.networkResponse.data),
-                            arrayOf(
-                                AlertAction("Ok", AlertActionType.neutral, null)
+                        },
+                        { error ->
+                            showAlert(
+                                "Request Failed",
+                                String(error.networkResponse.data),
+                                arrayOf(
+                                    AlertAction("Ok", AlertActionType.neutral)
+                                )
                             )
+                        }
+                    )
+                } else if (payment.id > 0) {
+                    showAlert(
+                        "Confirmation Required",
+                        "Are you sure you want to update this payment?",
+                        arrayOf(
+                            AlertAction(
+                                "Confirm",
+                                AlertActionType.positive
+                            ) { _, _ ->
+                                RequestManager.getInstance(context).updatePayment(
+                                    payment,
+                                    {response ->
+                                        showAlert(
+                                            "Payment updated successfully.",
+                                            null,
+                                            arrayOf(
+                                                AlertAction("Ok", AlertActionType.neutral)
+                                            )
+                                        )
+                                    },
+                                    {error ->
+                                        showAlert(
+                                            "Update failed",
+                                            String(error.networkResponse.data),
+                                            arrayOf(
+                                                AlertAction("Ok", AlertActionType.neutral)
+                                            )
+                                        )
+                                    }
+                                )
+                            },
+                            AlertAction("Cancel", AlertActionType.negative)
                         )
-                    }
-                )
+                    )
+                }
             }
         }
-        payment = intent.getSerializableExtra("payment") as Payment
         RequestManager.getInstance(this).requestVendors(
             { vendors ->
                 this.vendors = vendors
@@ -109,7 +149,7 @@ class PaymentDetail : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         vendorsPicker.setSelection(payment.vendorID-1)
     }
 
-    private fun showAlert(title: String, message: String, actions: Array<AlertAction>) {
+    private fun showAlert(title: String, message: String?, actions: Array<AlertAction>) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         builder.setMessage(message)
@@ -124,10 +164,10 @@ class PaymentDetail : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     enum class AlertActionType {positive, negative, neutral}
-    inner class AlertAction(
+    private class AlertAction(
         val title: String,
         val actionType: AlertActionType,
-        val actionHandler: ((DialogInterface, Int) -> Unit)?
+        val actionHandler: ((DialogInterface, Int) -> Unit)? = null
     )
 
 }

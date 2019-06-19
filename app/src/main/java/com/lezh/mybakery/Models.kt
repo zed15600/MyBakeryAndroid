@@ -9,7 +9,6 @@ class Payment: java.io.Serializable {
     companion object: KSerializer<Payment> {
         override fun serialize(encoder: Encoder, obj: Payment) {
             val elemOutput = encoder.beginStructure(descriptor)
-            if (obj.id > 0) elemOutput.encodeIntElement(descriptor, 0, obj.id)
             elemOutput.encodeIntElement(descriptor, 1, obj.vendorID)
             elemOutput.encodeStringElement(descriptor, 2, obj.date)
             elemOutput.encodeIntElement(descriptor, 3, obj.value)
