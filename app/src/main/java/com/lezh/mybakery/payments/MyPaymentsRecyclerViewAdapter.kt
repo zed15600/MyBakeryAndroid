@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.lezh.mybakery.Payment
 import com.lezh.mybakery.R
 import com.lezh.mybakery.RequestManager
+import com.lezh.mybakery.Vendor
 
 import com.lezh.mybakery.payments.PaymentsFragment.OnListFragmentInteractionListener
 
@@ -25,6 +26,7 @@ class MyPaymentsRecyclerViewAdapter(
     private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<MyPaymentsRecyclerViewAdapter.ViewHolder>() {
     private var mValues: Array<Payment> = emptyArray()
+    private var vendors: Array<Vendor> = emptyArray()
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val vendor: TextView = mView.vendor
@@ -45,16 +47,25 @@ class MyPaymentsRecyclerViewAdapter(
             // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
         }
-        RequestManager().request(
+        RequestManager.getInstance(context).request(
             "payments",
             { payments ->
                 mValues += payments
                 notifyDataSetChanged()
             },
             { error ->
-                Log.d("request", error.toString())
+                Log.d("request", error.message)
+            }
+        )
+        //TODO optimize this
+        RequestManager.getInstance(context).requestVendors(
+            { vendors ->
+                this.vendors = vendors
+                notifyDataSetChanged()
             },
-            context
+            { error ->
+                //TODO something with this error
+            }
         )
     }
 
@@ -66,7 +77,13 @@ class MyPaymentsRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.vendor.text = item.vendor
+        holder.vendor.text = {
+            var ret = ""
+            if (vendors.isNotEmpty()) {
+                ret = vendors[item.vendorID - 1].name
+            }
+            ret
+        }()
         holder.date.text = item.date
         holder.value.text = ""+item.value
 

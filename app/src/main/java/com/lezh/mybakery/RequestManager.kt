@@ -1,22 +1,48 @@
 package com.lezh.mybakery
 
 import android.content.Context
-import android.net.nsd.NsdManager
 import android.util.Log
 import com.android.volley.Request
+import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.parse
-import java.util.*
+import com.android.volley.toolbox.*
+import kotlinx.serialization.toUtf8Bytes
+import java.nio.charset.Charset
+import kotlin.collections.HashMap
 
-class RequestManager {
-    private val baseUrl = "http://54.233.228.170:3000/%s?format=json"
+class RequestManager constructor(context: Context) {
+    internal class StringRequest(
+        method: Int,
+        url: String,
+        private val heads: MutableMap<String, String>,
+        private val pars: String,
+        completion: (String) -> Unit,
+        errorCompletion: (VolleyError) -> Unit
+    ): com.android.volley.toolbox.StringRequest(method, url, completion, errorCompletion) {
 
-    fun request(target: String, completion: (Array<Payment>)->Unit, errorCompletion: (VolleyError)->Unit, context: Context) {
-        val queue = Volley.newRequestQueue(context)
+        override fun getHeaders(): MutableMap<String, String> {
+            return heads
+        }
+        override fun getBody(): ByteArray {
+            return pars.toUtf8Bytes()
+        }
+    }
+    companion object {
+        @Volatile
+        private var INSTANCE: RequestManager? = null
+        fun getInstance(context: Context) = INSTANCE ?: synchronized(this) {
+            INSTANCE ?: RequestManager(context).also {
+                INSTANCE = it
+            }
+        }
+    }
+    private val requestQueue: RequestQueue by lazy {
+        Volley.newRequestQueue(context.applicationContext)
+    }
+    private val baseUrl = "http://54.233.228.170:3000/%s.json"
+
+    fun request(target: String, completion: (Array<Payment>)->Unit, errorCompletion: (VolleyError)->Unit) {
         val url = baseUrl.format(target)
 
         val stringRequest = StringRequest(
@@ -30,11 +56,10 @@ class RequestManager {
                 errorCompletion(error)
             }
         )
-        queue.add(stringRequest)
+        requestQueue.add(stringRequest)
     }
 
-    fun requestVendors(completion: (Array<Vendor>) -> Unit, errorCompletion: (VolleyError) -> Unit, context: Context) {
-        val queue = Volley.newRequestQueue(context)
+    fun requestVendors(completion: (Array<Vendor>) -> Unit, errorCompletion: (VolleyError) -> Unit) {
         val url = baseUrl.format("vendors")
 
         val stringRequest = StringRequest(
@@ -46,6 +71,18 @@ class RequestManager {
             },
             Response.ErrorListener(errorCompletion)
         )
-        queue.add(stringRequest)
+        requestQueue.add(stringRequest)
+    }
+
+    fun createNewPayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val url = baseUrl.format("payments")
+
+        val headers = HashMap<String, String>().apply {
+            put("Content-Type", "application/json")
+        }
+        val params = "{\"payment\":$payment}"
+
+        val request = StringRequest(Request.Method.POST, url, headers, params, completion, errorCompletion)
+        requestQueue.add(request)
     }
 }
