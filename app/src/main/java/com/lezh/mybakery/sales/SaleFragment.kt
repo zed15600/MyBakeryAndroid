@@ -1,4 +1,4 @@
-package com.lezh.mybakery.payments
+package com.lezh.mybakery.sales
 
 import android.content.Context
 import android.content.Intent
@@ -13,16 +13,23 @@ import android.view.ViewGroup
 import com.lezh.mybakery.DetailHandler
 import com.lezh.mybakery.Payment
 import com.lezh.mybakery.R
+import com.lezh.mybakery.Sale
+import com.lezh.mybakery.payments.PaymentDetail
 
-class PaymentsFragment : Fragment(), DetailHandler {
+/**
+ * A fragment representing a list of Items.
+ * Activities containing this fragment MUST implement the
+ * [SaleFragment.OnListFragmentInteractionListener] interface.
+ */
+class SaleFragment : Fragment(), DetailHandler {
     interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(item: Payment?)
+        fun onListFragmentInteraction(item: Sale?)
     }
     companion object {
         const val ARG_COLUMN_COUNT = "column-count"
 
         @JvmStatic
-        fun newInstance(columnCount: Int) = PaymentsFragment().apply {
+        fun newInstance(columnCount: Int) = SaleFragment().apply {
             arguments = Bundle().apply {
                 putInt(ARG_COLUMN_COUNT, columnCount)
             }
@@ -52,7 +59,7 @@ class PaymentsFragment : Fragment(), DetailHandler {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_payments_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_sale_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -61,7 +68,7 @@ class PaymentsFragment : Fragment(), DetailHandler {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = activity?.baseContext?.let { PaymentsRecyclerViewAdapter(it, listener) }
+                adapter = activity?.baseContext?.let { SaleRecyclerViewAdapter(it, listener) }
             }
         }
         return view
@@ -73,9 +80,9 @@ class PaymentsFragment : Fragment(), DetailHandler {
     }
 
     override fun <T> openDetail(item: T?) {
-        val payment = item as Payment
-        val intent = Intent(this.context, PaymentDetail::class.java).apply {
-            putExtra("payment", payment)
+        val sale = item as Sale
+        val intent = Intent(this.context, SaleDetail::class.java).apply {
+            putExtra("sale", sale)
         }
         startActivity(intent)
     }

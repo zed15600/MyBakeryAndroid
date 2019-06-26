@@ -7,50 +7,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.lezh.mybakery.Payment
-import com.lezh.mybakery.R
-import com.lezh.mybakery.RequestManager
-import com.lezh.mybakery.Vendor
-
+import com.lezh.mybakery.*
 import com.lezh.mybakery.payments.PaymentsFragment.OnListFragmentInteractionListener
-
 import kotlinx.android.synthetic.main.fragment_payment_item.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [Payment] and makes a call to the
  * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
  */
-class MyPaymentsRecyclerViewAdapter(
+class PaymentsRecyclerViewAdapter(
     context: Context,
     private val mListener: OnListFragmentInteractionListener?
-) : RecyclerView.Adapter<MyPaymentsRecyclerViewAdapter.ViewHolder>() {
-    private var mValues: Array<Payment> = emptyArray()
-    private var vendors: Array<Vendor> = emptyArray()
-
-    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
+): RecyclerView.Adapter<PaymentsRecyclerViewAdapter.ViewHolder>() {
+    inner class ViewHolder(val mView: View): RecyclerView.ViewHolder(mView) {
         val vendor: TextView = mView.vendor
         val date: TextView = mView.date
         val value: TextView = mView.value
-
-        /*override fun toString(): String {
-            return super.toString() + " '" + vendor.text + "'"
-        }*/
     }
-
+    private var mValues: Array<Payment> = emptyArray()
+    private var vendors: Array<Vendor> = emptyArray()
     private val mOnClickListener: View.OnClickListener
+
 
     init {
         mOnClickListener = View.OnClickListener { v ->
             val item = v.tag as Payment
-            // Notify the active callbacks interface (the activity, if the fragment is attached to
-            // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
         }
         RequestManager.getInstance(context).requestPayments(
-            "payments",
-            { payments ->
-                mValues += payments
+            { response ->
+                mValues += ResponsePayments().toObject(response).results
                 notifyDataSetChanged()
             },
             { error ->
@@ -59,8 +45,8 @@ class MyPaymentsRecyclerViewAdapter(
         )
         //TODO optimize this
         RequestManager.getInstance(context).requestVendors(
-            { vendors ->
-                this.vendors = vendors
+            { response ->
+                this.vendors = ResponseVendors().toObject(response).vendors
                 notifyDataSetChanged()
             },
             { error ->
@@ -80,7 +66,8 @@ class MyPaymentsRecyclerViewAdapter(
         holder.vendor.text = {
             var ret = ""
             if (vendors.isNotEmpty()) {
-                ret = vendors[item.vendorID - 1].name
+                val vend = vendors.find { it.id == item.vendorID }
+                ret = vend?.name!!
             }
             ret
         }()

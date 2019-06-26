@@ -1,14 +1,11 @@
 package com.lezh.mybakery
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.*
 import kotlinx.serialization.toUtf8Bytes
-import java.nio.charset.Charset
 import kotlin.collections.HashMap
 
 class RequestManager constructor(context: Context) {
@@ -43,53 +40,63 @@ class RequestManager constructor(context: Context) {
     }
     private val baseUrl = "http://54.233.228.170:3000/%s.json"
 
-    fun requestPayments(target: String, completion: (Array<Payment>)->Unit, errorCompletion: (VolleyError)->Unit) {
+    fun requestPayments(completion: (String) -> Unit, errorCompletion: (VolleyError)->Unit) {
+        request("", "payments", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun requestVendors(completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "vendors", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun requestSales(completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "sales", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun requestProducts(completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "products", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun createNewItem(item: Item, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        when (item::class) {
+            Payment::class -> createNewPayment(item as Payment, completion, errorCompletion)
+            Sale::class -> createNewSale(item as Sale, completion, errorCompletion)
+        }
+    }
+
+    fun updateItem(item: Item, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        when (item::class) {
+            Payment::class -> updatePayment(item as Payment, completion, errorCompletion)
+            Sale::class -> updateSale(item as Sale, completion, errorCompletion)
+        }
+    }
+
+    private fun createNewPayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"payment\":${payment.toJsonString()}}"
+        request(params, "payments", Request.Method.POST, completion, errorCompletion)
+    }
+
+    private fun createNewSale(sale: Sale, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"sale\":${sale.toJsonString()}}"
+        request(params, "sales", Request.Method.POST, completion, errorCompletion)
+    }
+
+    private fun updatePayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"payment\":${payment.toJsonString()}}"
+        request(params, "payments/${payment.id}", Request.Method.PATCH, completion, errorCompletion)
+    }
+
+    private fun updateSale(sale: Sale, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"sale\":${sale.toJsonString()}}"
+        request(params, "sales/${sale.id}", Request.Method.PATCH, completion, errorCompletion)
+    }
+
+    private fun request(
+        params: String,
+        target: String,
+        method: Int,
+        completion: (String) -> Unit,
+        errorCompletion: (VolleyError) -> Unit) {
         val url = baseUrl.format(target)
-
-        val stringRequest = StringRequest(
-            Request.Method.GET,
-            url,
-            Response.Listener { response ->
-                var resp = Response().toObject(response)
-                completion(resp.results)
-            },
-            Response.ErrorListener { error ->
-                errorCompletion(error)
-            }
-        )
-        requestQueue.add(stringRequest)
-    }
-
-    fun requestVendors(completion: (Array<Vendor>) -> Unit, errorCompletion: (VolleyError) -> Unit) {
-        val url = baseUrl.format("vendors")
-
-        val stringRequest = StringRequest(
-            Request.Method.GET,
-            url,
-            Response.Listener { response ->
-                var resp = ResponseVendors().toObject(response)
-                completion(resp.vendors)
-            },
-            Response.ErrorListener(errorCompletion)
-        )
-        requestQueue.add(stringRequest)
-    }
-
-    fun createNewPayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
-        request(payment, "payments", Request.Method.POST, completion, errorCompletion)
-    }
-
-    fun updatePayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
-        request(payment, "payments/${payment.id}", Request.Method.PATCH, completion, errorCompletion)
-    }
-
-    private fun request(payment: Payment,
-                    target: String,
-                    method: Int,
-                    completion: (String) -> Unit,
-                    errorCompletion: (VolleyError) -> Unit) {
-        val url = baseUrl.format(target)
-        val params = "{\"payment\":$payment}"
 
         val request = StringRequest(method, url, params, completion, errorCompletion)
         requestQueue.add(request)

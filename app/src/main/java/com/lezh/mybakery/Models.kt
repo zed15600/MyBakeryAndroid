@@ -4,41 +4,28 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 @Serializable
-class Payment: java.io.Serializable {
-    @Serializer(forClass = Payment::class)
-    companion object: KSerializer<Payment> {
-        override fun serialize(encoder: Encoder, obj: Payment) {
-            val elemOutput = encoder.beginStructure(descriptor)
-            elemOutput.encodeIntElement(descriptor, 1, obj.vendorID)
-            elemOutput.encodeStringElement(descriptor, 2, obj.date)
-            elemOutput.encodeIntElement(descriptor, 3, obj.value)
-            elemOutput.endStructure(descriptor)
-        }
-    }
-
-    var id: Int = 0
+class Payment: Item, java.io.Serializable {
+    override var id: Int = 0
     @SerialName("vendor_id")
     var vendorID: Int = 0
     var date: String = ""
     var value: Int = 0
 
-    override fun toString(): String {
-        val json = Json(JsonConfiguration.Stable)
-        return json.stringify(Payment.serializer(), this)
+    fun toJsonString(): String {
+        return toJsonString(serializer(), this)
     }
 
     fun toObject(stringValue: String): Payment {
-        return com.lezh.mybakery.toObject(Payment.serializer(), stringValue)
+        return toObject(serializer(), stringValue)
     }
 }
 
 @Serializable
-class Response {
+class ResponsePayments {
     var results: Array<Payment> = emptyArray()
 
-    fun toObject(stringValue: String): Response {
-        val json = Json(JsonConfiguration.Stable)
-        return json.parse(Response.serializer(), stringValue)
+    fun toObject(stringValue: String): ResponsePayments {
+        return toObject(serializer(), stringValue)
     }
 }
 
@@ -59,12 +46,62 @@ class ResponseVendors {
     var vendors: Array<Vendor> = emptyArray()
 
     fun toObject(stringValue: String): ResponseVendors {
-        val json = Json(JsonConfiguration.Stable)
-        return json.parse(ResponseVendors.serializer(), stringValue)
+        return toObject(serializer(), stringValue)
+    }
+}
+
+@Serializable
+class Sale: Item, java.io.Serializable {
+    override var id: Int = 0
+    var date: String = ""
+    @SerialName("product_id")
+    var productId: Int = 0
+    var ammount: Int = 0
+    @SerialName("vendor_id")
+    var vendorId: Int = 0
+    @SerialName("total_value")
+    var total: Int = 0
+
+    fun toJsonString(): String {
+        return toJsonString(serializer(), this)
+    }
+}
+
+@Serializable
+class ResponseSales {
+    var results: Array<Sale> = emptyArray()
+
+    fun toObject(stringValue: String): ResponseSales {
+        return toObject(serializer(), stringValue)
+    }
+}
+
+@Serializable
+class Product {
+    var id: Int = 0
+    var name: String = ""
+    var description: String = ""
+    var price: Int = 0
+
+    override fun toString(): String {
+        return name
+    }
+}
+
+@Serializable
+class ResponseProducts {
+    var results: Array<Product> = emptyArray()
+
+    fun toObject(stringValue: String): ResponseProducts {
+        return toObject(serializer(), stringValue)
     }
 }
 
 private fun <T> toObject(serializer: DeserializationStrategy<T>, stringValue: String): T {
+    return Json.nonstrict.parse(serializer, stringValue)
+}
+
+private fun <T> toJsonString(serializer: SerializationStrategy<T>, obj: T): String {
     val json = Json(JsonConfiguration.Stable)
-    return json.parse(serializer, stringValue)
+    return json.stringify(serializer, obj)
 }

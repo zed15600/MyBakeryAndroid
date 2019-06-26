@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" android:background="@drawable/rectangle">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+                android:id="@+id/sale_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_weight="1"/>
+        <TextView
+                android:id="@+id/sale_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_weight="1"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/sale_vendor" android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_margin="@dimen/text_margin"/>
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                android:layout_margin="@dimen/text_margin"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/sale_ammount" android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_margin="@dimen/text_margin"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/sale_total" android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_margin="@dimen/text_margin"/>
+    </LinearLayout>
+
+</LinearLayout>

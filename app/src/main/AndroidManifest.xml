@@ -12,12 +12,14 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true">
+        <activity android:name=".sales.SaleDetail">
+        </activity>
         <activity
                 android:name=".plusButton.PlusButton"
                 android:label="@string/title_activity_plus_button"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".PaymentDetail">
+        <activity android:name=".payments.PaymentDetail">
         </activity>
         <activity
                 android:name=".MainActivity"
