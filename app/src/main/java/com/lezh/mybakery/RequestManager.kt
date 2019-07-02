@@ -1,6 +1,7 @@
 package com.lezh.mybakery
 
 import android.content.Context
+import android.util.Log
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -8,7 +9,7 @@ import com.android.volley.toolbox.*
 import kotlinx.serialization.toUtf8Bytes
 import kotlin.collections.HashMap
 
-class RequestManager constructor(context: Context) {
+class RequestManager constructor(val context: Context) {
     internal class StringRequest(
         method: Int,
         url: String,
@@ -56,10 +57,23 @@ class RequestManager constructor(context: Context) {
         request("", "products", Request.Method.GET, completion, errorCompletion)
     }
 
+    fun requestExpenditures(completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "expenditures", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun requestFeedstocks(completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "feedstocks", Request.Method.GET, completion, errorCompletion)
+    }
+
+    fun requestExpenditureDetails(expenditure: Expenditure, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        request("", "expenditures/${expenditure.id}", Request.Method.GET, completion, errorCompletion)
+    }
+
     fun createNewItem(item: Item, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
         when (item::class) {
             Payment::class -> createNewPayment(item as Payment, completion, errorCompletion)
             Sale::class -> createNewSale(item as Sale, completion, errorCompletion)
+            Expenditure::class -> createNewExpenditure(item as Expenditure, completion, errorCompletion)
         }
     }
 
@@ -67,6 +81,7 @@ class RequestManager constructor(context: Context) {
         when (item::class) {
             Payment::class -> updatePayment(item as Payment, completion, errorCompletion)
             Sale::class -> updateSale(item as Sale, completion, errorCompletion)
+            Expenditure::class -> updateExpenditure(item as Expenditure, completion, errorCompletion)
         }
     }
 
@@ -80,6 +95,11 @@ class RequestManager constructor(context: Context) {
         request(params, "sales", Request.Method.POST, completion, errorCompletion)
     }
 
+    private fun createNewExpenditure(expenditure: Expenditure, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"expenditure\":${expenditure.toJsonString()}}"
+        request(params, "expenditures", Request.Method.POST, completion, errorCompletion)
+    }
+
     private fun updatePayment(payment: Payment, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
         val params = "{\"payment\":${payment.toJsonString()}}"
         request(params, "payments/${payment.id}", Request.Method.PATCH, completion, errorCompletion)
@@ -88,6 +108,11 @@ class RequestManager constructor(context: Context) {
     private fun updateSale(sale: Sale, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
         val params = "{\"sale\":${sale.toJsonString()}}"
         request(params, "sales/${sale.id}", Request.Method.PATCH, completion, errorCompletion)
+    }
+
+    private fun updateExpenditure(expenditure: Expenditure, completion: (String) -> Unit, errorCompletion: (VolleyError) -> Unit) {
+        val params = "{\"expenditure\":${expenditure.toJsonString()}}"
+        request(params, "expenditures/${expenditure.id}", Request.Method.PATCH, completion, errorCompletion)
     }
 
     private fun request(

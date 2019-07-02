@@ -60,7 +60,7 @@ class SaleDetail: AppCompatActivity() {
         amount.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (productPicker.selectedItemPosition != AdapterView.INVALID_POSITION) {
-                    sale.ammount = p0.toString().toInt()
+                    sale.ammount = if (p0!!.isNotEmpty()) p0.toString().toInt() else 0
                     updateTotal()
                 }
             }
@@ -119,7 +119,8 @@ class SaleDetail: AppCompatActivity() {
     }
 
     private fun updateTotal() {
-        val value = amount.text.toString().toInt() * (productPicker.selectedItem as Product).price
+        val amountInt = if (amount.text.isNotEmpty()) amount.text.toString().toInt() else 0
+        val value =  amountInt * (productPicker.selectedItem as Product).price
         sale.total = value
         total.text = "$value"
     }

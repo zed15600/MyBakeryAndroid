@@ -2,6 +2,9 @@ package com.lezh.mybakery
 
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import java.time.Instant
+import java.util.*
+import kotlin.jvm.Transient
 
 @Serializable
 class Payment: Item, java.io.Serializable {
@@ -95,6 +98,66 @@ class ResponseProducts {
     fun toObject(stringValue: String): ResponseProducts {
         return toObject(serializer(), stringValue)
     }
+}
+
+@Serializable
+class Expenditure: Item, java.io.Serializable {
+    override var id: Int = 0
+    var date: String = ""
+    @SerialName("total_value")
+    var total: Int = 0
+    var feedstocks: Array<ExpenditureFeedstock> = emptyArray()
+    @kotlinx.serialization.Transient
+    var dDate: Date? = null
+
+    fun toObject(stringValue: String): Expenditure {
+        val obj = toObject(serializer(), stringValue)
+        obj.dDate = Date.from(Instant.parse(obj.date + "T05:00:00.00Z"))
+        return obj
+    }
+
+    fun toJsonString(): String {
+        return toJsonString(serializer(), this)
+    }
+}
+
+@Serializable
+class ResponseExpenditures {
+    var results: Array<Expenditure> = emptyArray()
+
+    fun toObject(stringValue: String): ResponseExpenditures {
+        return toObject(serializer(), stringValue)
+    }
+}
+
+@Serializable
+class Feedstock {
+    var id: Int = 0
+    var name: String = ""
+    var price: Int = 0
+
+    override fun toString(): String {
+        return name
+    }
+}
+
+@Serializable
+class ResponseFeedstocks {
+    var results: Array<Feedstock> = emptyArray()
+
+    fun toObject(stringValue: String): ResponseFeedstocks {
+        return toObject(serializer(), stringValue)
+    }
+}
+
+@Serializable
+class ExpenditureFeedstock: java.io.Serializable {
+    @SerialName("feedstock_id")
+    var feedstockID: Int = 0
+    @SerialName("ammount")
+    var amount: Int = 0
+    @SerialName("price")
+    var total: Int = 0
 }
 
 private fun <T> toObject(serializer: DeserializationStrategy<T>, stringValue: String): T {

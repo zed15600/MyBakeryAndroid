@@ -10,10 +10,6 @@ import com.lezh.mybakery.*
 import com.lezh.mybakery.sales.SaleFragment.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.fragment_sale.view.*
 
-/**
- * [RecyclerView.Adapter] that can display a [Sale] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- */
 class SaleRecyclerViewAdapter(
     context: Context,
     private val mListener: OnListFragmentInteractionListener?

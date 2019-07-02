@@ -11,10 +11,6 @@ import com.lezh.mybakery.*
 import com.lezh.mybakery.payments.PaymentsFragment.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.fragment_payment_item.view.*
 
-/**
- * [RecyclerView.Adapter] that can display a [Payment] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- */
 class PaymentsRecyclerViewAdapter(
     context: Context,
     private val mListener: OnListFragmentInteractionListener?
@@ -28,7 +24,6 @@ class PaymentsRecyclerViewAdapter(
     private var vendors: Array<Vendor> = emptyArray()
     private val mOnClickListener: View.OnClickListener
 
-
     init {
         mOnClickListener = View.OnClickListener { v ->
             val item = v.tag as Payment
@@ -40,7 +35,7 @@ class PaymentsRecyclerViewAdapter(
                 notifyDataSetChanged()
             },
             { error ->
-                Log.d("requestPayments", String(error.networkResponse.data))
+                //TODO something with this error
             }
         )
         //TODO optimize this

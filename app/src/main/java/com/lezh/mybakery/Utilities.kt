@@ -17,6 +17,7 @@ fun <T: Item> commitItem(context: Context, item: T) {
     when (item::class) {
         Payment::class -> itemType = "payment"
         Sale::class -> itemType = "sale"
+        Expenditure::class -> itemType = "expenditure"
     }
     if (item.id == 0) {
         RequestManager.getInstance(context).createNewItem(
@@ -28,7 +29,7 @@ fun <T: Item> commitItem(context: Context, item: T) {
                     fun toObject(stringValue: String): Item {
                         return Json.nonstrict.parse(serializer(), stringValue)
                     }
-                }).toObject(response).id//Payment().toObject(response).id
+                }).toObject(response).id
                 AlertManager.showAlert(
                     context,
                     "Request Successful",
